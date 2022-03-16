@@ -76,7 +76,7 @@ pipeline {
 		
 		stage('Docker push') {
 			steps {
-				withDockerRegistry([credentialsId: registryCredential]) {
+				withDockerRegistry([credentialsId: registryCredential, url: ""]) {
 					sh "docker tag $DockerUserName/$ProjectName:latest $DockerUserName/$ProjectName:$BUILD_NUMBER"
 					sh "docker push $DockerUserName/$ProjectName:$BUILD_NUMBER"
 					sh "docker push $DockerUserName/$ProjectName:latest"
@@ -92,8 +92,8 @@ pipeline {
 		stage('Deploy to k8s') {
 			steps {
 				kubernetesDeploy(
-					kubeconfigId: 'Kubeconfig',
-					// kubeconfigId: 'kubeG1',
+					// kubeconfigId: 'Kubeconfig',
+					kubeconfigId: 'kubeG1',
                     configs: 'deployment.yml',
                     enableConfigSubstitution: true
                 )
