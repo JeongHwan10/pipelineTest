@@ -104,8 +104,8 @@ pipeline {
 		stage('Deploy to k8s') {
 			steps {
 				kubernetesDeploy(
-					// kubeconfigId: 'Kubeconfig',
-					kubeconfigId: 'kubeG1',					
+					kubeconfigId: 'Kubeconfig',
+					// kubeconfigId: 'kubeG1',					
                     configs: 'deployment.yml',
                     enableConfigSubstitution: true
                 )
