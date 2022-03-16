@@ -34,12 +34,6 @@ pipeline {
 	
 	/* SCM 소스 checkout */
 	stages{
-		stage('Parameter Test') {
-			steps {				
-				//echo "${params.parameterTest}"
-				echo "parameter test step"
-			}
-		}
 		stage('Initialize') {
             steps{
                 echo "M2_HOME = /opt/maven"
@@ -55,18 +49,7 @@ pipeline {
 	
 		stage('Checkout') {
 			steps {
-				svn 'svn://localhost/sample/trunk/network-pipeline-config'
-				fileOperations([
-					folderDeleteOperation('JenkinsConfig'),
-					folderCreateOperation('JenkinsConfig'),
-					fileCreateOperation(fileName: 'testDockerfile', fileContent: 'FROM tomcat:9'),
-					fileCopyOperation (
-						excludes: '',
-						flattenFiles: false,
-						includes: '*',
-						targetLocation: 'JenkinsConfig/' )
-					])
-				svn 'svn://localhost/sample/trunk/tomcattest2'				
+				echo "git Checkout stage..."	
 			}
 			post {
 				failure {
