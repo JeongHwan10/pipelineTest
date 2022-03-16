@@ -23,6 +23,7 @@ pipeline {
 	
 	options {
 		retry(1)
+		timestamps()
 	}
 	
 	/* SCM 소스 checkout */
@@ -64,7 +65,7 @@ pipeline {
 		
 		stage('Docker Build image') {
 			steps {
-				sh 'docker build -t $DockerUserName/$ProjectName:latest .'				
+				sh "docker build -t $DockerUserName/$ProjectName:latest ."
 			}
 			post {
 				failure {
@@ -75,10 +76,10 @@ pipeline {
 		
 		stage('Docker push') {
 			steps {
-				withDockerRegistry([credentialsId: registryCredential, url: ""]) {
-					sh 'docker tag $DockerUserName/$ProjectName:latest $DockerUserName/$ProjectName:$BUILD_NUMBER'
-					sh 'docker push $DockerUserName/$ProjectName:$BUILD_NUMBER'
-					sh 'docker push $DockerUserName/$ProjectName:latest'
+				withDockerRegistry([credentialsId: registryCredential]) {
+					sh "docker tag $DockerUserName/$ProjectName:latest $DockerUserName/$ProjectName:$BUILD_NUMBER"
+					sh "docker push $DockerUserName/$ProjectName:$BUILD_NUMBER"
+					sh "docker push $DockerUserName/$ProjectName:latest"
 				}
 			}
 			post {
@@ -92,7 +93,7 @@ pipeline {
 			steps {
 				kubernetesDeploy(
 					kubeconfigId: 'Kubeconfig',
-					// kubeconfigId: 'kubeG1',					
+					// kubeconfigId: 'kubeG1',
                     configs: 'deployment.yml',
                     enableConfigSubstitution: true
                 )
@@ -110,8 +111,8 @@ pipeline {
             sh "docker logout"
 			
 			sh "echo Docker image Clean..."
-			sh 'docker rmi $DockerUserName/$ProjectName:$BUILD_NUMBER'
-			sh 'docker rmi $DockerUserName/$ProjectName:latest'
+			sh "docker rmi $DockerUserName/$ProjectName:$BUILD_NUMBER"
+			sh "docker rmi $DockerUserName/$ProjectName:latest"
         }
 		success {
 			slackSend tokenCredentialId: 'slackJenkinsId', color: "good", message: "${JOB_NAME} - #${BUILD_NUMBER} succeeeded (<${env.BUILD_URL}|Open>)"	
