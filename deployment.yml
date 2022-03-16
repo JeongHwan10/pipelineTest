@@ -1,0 +1,38 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: ${ProjectName}-deployment
+  labels:
+    app: ${ProjectName}
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: ${ProjectName}
+  template:
+    metadata:
+      labels:
+        app: ${ProjectName}
+    spec:
+      containers:
+      - name: ${ProjectName}
+        image: ${DockerUserName}/${ProjectName}:latest
+        imagePullPolicy: Always
+        ports:
+        - containerPort: 8080
+      #nodeSelector:
+        #key: docker-desktop
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: ${ProjectName}-service
+spec:
+  selector:
+    app: ${ProjectName}
+  type: NodePort
+  ports:
+    - protocol: TCP
+      port: 8082
+      targetPort: 8080
+      nodePort: 30000

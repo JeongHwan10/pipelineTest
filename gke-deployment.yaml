@@ -1,0 +1,38 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: network-pipeline-test-deployment
+  labels:
+    app: network-pipeline-test
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: network-pipeline-test
+  template:
+    metadata:
+      labels:
+        app: network-pipeline-test
+    spec:
+      containers:
+      - name: network-pipeline-test
+        image: wjdghks1057/network-pipeline-test:latest
+        imagePullPolicy: Always
+        ports:
+        - containerPort: 8080
+      #nodeSelector:
+        #key: docker-desktop
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: network-pipeline-test-service
+spec:
+  selector:
+    app: network-pipeline-test
+  type: NodePort
+  ports:
+    - protocol: TCP
+      port: 8082
+      targetPort: 8080
+      nodePort: 30000
