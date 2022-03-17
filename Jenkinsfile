@@ -63,7 +63,8 @@ pipeline {
 			agent {
 				docker {
 					image 'maven:3.3.9-jdk-8'
-					args '-w /root/.m2:/root/.m2'
+					args '-v $HOME/.m2:/root/.m2'
+					// args '-w /root/.m2:/root/.m2'
 				}
 			}
 			environment {
