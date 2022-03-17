@@ -62,8 +62,7 @@ pipeline {
 		stage('Maven Build') {
 			agent {
 				docker {
-					image 'jenkins/jnlp-agent-maven:windows-nanoserver-jdk11'
-					// image 'maven:3.3.9-jdk-8'
+					image 'maven:3.3.9-jdk-8'
 					// args '-v /root/.m2:/root/.m2'
 				}
 			}
