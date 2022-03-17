@@ -1,5 +1,5 @@
 pipeline {
-	agent any
+	agent none
 	//parameters {
 	//	string (name: 'parameterTest', defaultValue: 'Paraaaaaa', description: 'parameter hello')
 	//}
@@ -16,10 +16,10 @@ pipeline {
 		registryCredential = 'docker-hub'
 	}
 	
-	tools {
-		maven 'Maven 3.3.9'
-		jdk 'jdk8'
-	}	
+	//tools {
+	//	maven 'Maven 3.3.9'
+	//	jdk 'jdk8'
+	//}	
 	
 	options {
 		retry(1)
@@ -28,31 +28,34 @@ pipeline {
 	
 	/* SCM 소스 checkout */
 	stages{
-		stage('Initialize') {
-            steps{
-                echo "M2_HOME = /opt/maven"
-				echo "PATH = ${M2_HOME}/bin:${PATH}"
-				echo "PATH+EXTRA=/usr/local/bin"
-            }
-			post {
-				failure {
-					script { env.FAILURE_STAGE = 'Initialize' }
-				}
-			}
-        }		
+		//stage('Initialize') {
+        //    steps{
+        //        echo "M2_HOME = /opt/maven"
+		//		echo "PATH = ${M2_HOME}/bin:${PATH}"
+		//		echo "PATH+EXTRA=/usr/local/bin"
+        //    }
+		//	post {
+		//		failure {
+		//			script { env.FAILURE_STAGE = 'Initialize' }
+		//		}
+		//	}
+        //}		
 	
-		stage('Checkout') {
-			steps {
-				echo "git Checkout stage..."	
-			}
-			post {
-				failure {
-					script { env.FAILURE_STAGE = 'Checkout' }
-				}
-			}
-		}
+		//stage('Checkout') {
+		//	steps {
+		//		echo "git Checkout stage..."	
+		//	}
+		//	post {
+		//		failure {
+		//			script { env.FAILURE_STAGE = 'Checkout' }
+		//		}
+		//	}
+		//}
 	
 		stage('Maven Build') {
+			agent {
+				docker 'maven:3.3.9-jdk-8-alpine'
+			}
 			steps {
 				sh 'mvn clean install'
 			}
@@ -63,18 +66,13 @@ pipeline {
 			}
 		}
 		
-		stage('Docker Build image') {
+		stage('Docker Build&Push') {
+			agent {
+				docker 'docker:latest'
+			}
 			steps {
 				sh "docker build -t $DockerUserName/$ProjectName:latest ."
 			}
-			post {
-				failure {
-					script { env.FAILURE_STAGE = 'Docker Build image' }
-				}
-			}
-		}
-		
-		stage('Docker push') {
 			steps {
 				withDockerRegistry([credentialsId: registryCredential, url: ""]) {
 					sh "docker tag $DockerUserName/$ProjectName:latest $DockerUserName/$ProjectName:$BUILD_NUMBER"
@@ -83,6 +81,13 @@ pipeline {
 				}
 			}
 			post {
+				always { 
+					// sh "docker logout"
+					
+					sh "echo Docker image Clean..."
+					sh "docker rmi $DockerUserName/$ProjectName:$BUILD_NUMBER"
+					sh "docker rmi $DockerUserName/$ProjectName:latest"
+				}
 				failure {
 					script { env.FAILURE_STAGE = 'Docker push' }
 				}
@@ -90,11 +95,13 @@ pipeline {
 		}
 		
 		stage('Deploy to k8s') {
+			agent any
 			steps {
 				kubernetesDeploy(
 					// kubeconfigId: 'Kubeconfig',
 					kubeconfigId: 'kubeG1',
                     configs: 'deployment.yml',
+					// yml 파일의 $var와 ${var}를 젠킨스 environment로 대체한다
                     enableConfigSubstitution: true
                 )
 			}
@@ -106,14 +113,7 @@ pipeline {
 		}
 	}
 	
-	 post { 
-        always { 
-            sh "docker logout"
-			
-			sh "echo Docker image Clean..."
-			sh "docker rmi $DockerUserName/$ProjectName:$BUILD_NUMBER"
-			sh "docker rmi $DockerUserName/$ProjectName:latest"
-        }
+	 post {        
 		success {
 			slackSend tokenCredentialId: 'slackJenkinsId', color: "good", message: "${JOB_NAME} - #${BUILD_NUMBER} succeeeded (<${env.BUILD_URL}|Open>)"	
         }
