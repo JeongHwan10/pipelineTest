@@ -1,5 +1,12 @@
 pipeline {
-	agent any
+
+	//agent any
+	agent {
+		docker {
+			image 'ubuntu:latest'
+		}
+	}
+	
 	//parameters {
 	//	string (name: 'parameterTest', defaultValue: 'Paraaaaaa', description: 'parameter hello')
 	//}
