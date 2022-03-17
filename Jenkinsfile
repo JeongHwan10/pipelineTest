@@ -66,7 +66,7 @@ pipeline {
 			}
 		}
 		
-		stage('Docker Build&Push') {
+		stage('Docker Build and Push') {
 			agent {
 				docker 'docker:latest'
 			}
