@@ -54,7 +54,9 @@ pipeline {
 	
 		stage('Maven Build') {
 			agent {
-				docker 'maven:3.3.9-jdk-8'
+				docker {
+					image 'maven:3.3.9-jdk-8'
+				}
 			}
 			steps {
 				sh 'mvn clean install'
@@ -68,7 +70,9 @@ pipeline {
 		
 		stage('Docker Build and Push') {
 			agent {
-				docker 'docker:latest'
+				docker {
+					image 'docker:latest'
+				}
 			}
 			environment {
 				DockerUserName='192.168.143.151:5000'
