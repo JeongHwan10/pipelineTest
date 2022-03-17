@@ -59,6 +59,9 @@ pipeline {
 					args '-v /root/.m2:/root/.m2'
 				}
 			}
+			environment {
+				JENKINS_RUNNING_IN_CONTAINER = true
+			}
 			steps {
 				sh 'mvn clean install'
 			}
