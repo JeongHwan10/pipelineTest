@@ -1,32 +1,26 @@
 pipeline {
-	agent none
-	
-	//agent {
-	//	docker {
-	//		image 'ubuntu:latest'
-	//	}
-	//}
+	agent any
 	
 	//parameters {
 	//	string (name: 'parameterTest', defaultValue: 'Paraaaaaa', description: 'parameter hello')
 	//}
 	/* pipeline 변수 설정 */
-	//environment {
-	//	// 로컬 리포지토리 사용
-	//	// DockerUserName='wjdghks1057'
-	//	// DockerUserName='192.168.143.123:5000'
-	//	
-	//	// 네트워크 환경의 도커 리포지토리 G1
-	//	DockerUserName='192.168.143.151:5000'
-	//	
-	//	ProjectName='git-test'
-	//	registryCredential = 'docker-hub'
-	//}
+	environment {
+		// 로컬 리포지토리 사용
+		// DockerUserName='wjdghks1057'
+		// DockerUserName='192.168.143.123:5000'
+		
+		// 네트워크 환경의 도커 리포지토리 G1
+		DockerUserName='192.168.143.151:5000'
+		
+		ProjectName='git-test'
+		registryCredential = 'docker-hub'
+	}
 	
-	//tools {
-	//	maven 'Maven 3.3.9'
-	//	jdk 'jdk8'
-	//}	
+	tools {
+		maven 'Maven 3.3.9'
+		jdk 'jdk8'
+	}	
 	
 	options {
 		retry(1)
@@ -35,42 +29,31 @@ pipeline {
 	
 	/* SCM 소스 checkout */
 	stages{
-		//stage('Initialize') {
-        //    steps{
-        //        echo "M2_HOME = /opt/maven"
-		//		echo "PATH = ${M2_HOME}/bin:${PATH}"
-		//		echo "PATH+EXTRA=/usr/local/bin"
-        //    }
-		//	post {
-		//		failure {
-		//			script { env.FAILURE_STAGE = 'Initialize' }
-		//		}
-		//	}
-        //}		
-	
-		//stage('Checkout') {
-		//	steps {
-		//		echo "git Checkout stage..."	
-		//	}
-		//	post {
-		//		failure {
-		//			script { env.FAILURE_STAGE = 'Checkout' }
-		//		}
-		//	}
-		//}
-	
-		stage('Maven Build') {
-			agent {
-				docker {
-					// image 'maven:3.3.9-jdk-8'
-					image 'maven:3.8.1-adoptopenjdk-11'
-					args '-v $HOME/.m2:/root/.m2'
-					// args '-w /root/.m2:/root/.m2'
+		stage('Initialize') {
+            steps{
+                echo "M2_HOME = /opt/maven"
+				echo "PATH = ${M2_HOME}/bin:${PATH}"
+				echo "PATH+EXTRA=/usr/local/bin"
+            }
+			post {
+				failure {
+					script { env.FAILURE_STAGE = 'Initialize' }
 				}
 			}
-			environment {
-				JENKINS_RUNNING_IN_CONTAINER = true
+        }		
+	
+		stage('Checkout') {
+			steps {
+				echo "git Checkout stage..."	
 			}
+			post {
+				failure {
+					script { env.FAILURE_STAGE = 'Checkout' }
+				}
+			}
+		}
+	
+		stage('Maven Build') {
 			steps {
 				sh 'mvn clean install'
 			}
@@ -82,16 +65,6 @@ pipeline {
 		}
 		
 		stage('Docker Build and Push') {
-			agent {
-				docker {
-					image 'docker:latest'
-				}
-			}
-			environment {
-				DockerUserName='192.168.143.151:5000'
-				ProjectName='git-test'
-				registryCredential = 'docker-hub'
-			}
 			steps {
 				sh "docker build -t $DockerUserName/$ProjectName:latest ."
 				
