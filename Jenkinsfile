@@ -77,8 +77,7 @@ pipeline {
 			}
 			steps {
 				sh "docker build -t $DockerUserName/$ProjectName:latest ."
-			}
-			steps {
+				
 				withDockerRegistry([credentialsId: registryCredential, url: ""]) {
 					sh "docker tag $DockerUserName/$ProjectName:latest $DockerUserName/$ProjectName:$BUILD_NUMBER"
 					sh "docker push $DockerUserName/$ProjectName:$BUILD_NUMBER"
