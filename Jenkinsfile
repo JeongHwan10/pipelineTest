@@ -4,17 +4,17 @@ pipeline {
 	//	string (name: 'parameterTest', defaultValue: 'Paraaaaaa', description: 'parameter hello')
 	//}
 	/* pipeline 변수 설정 */
-	environment {
-		// 로컬 리포지토리 사용
-		// DockerUserName='wjdghks1057'
-		// DockerUserName='192.168.143.123:5000'
-		
-		// 네트워크 환경의 도커 리포지토리 G1
-		DockerUserName='192.168.143.151:5000'
-		
-		ProjectName='git-test'
-		registryCredential = 'docker-hub'
-	}
+	//environment {
+	//	// 로컬 리포지토리 사용
+	//	// DockerUserName='wjdghks1057'
+	//	// DockerUserName='192.168.143.123:5000'
+	//	
+	//	// 네트워크 환경의 도커 리포지토리 G1
+	//	DockerUserName='192.168.143.151:5000'
+	//	
+	//	ProjectName='git-test'
+	//	registryCredential = 'docker-hub'
+	//}
 	
 	//tools {
 	//	maven 'Maven 3.3.9'
@@ -70,6 +70,11 @@ pipeline {
 			agent {
 				docker 'docker:latest'
 			}
+			environment {
+				DockerUserName='192.168.143.151:5000'
+				ProjectName='git-test'
+				registryCredential = 'docker-hub'
+			}
 			steps {
 				sh "docker build -t $DockerUserName/$ProjectName:latest ."
 			}
@@ -113,7 +118,7 @@ pipeline {
 		}
 	}
 	
-	 post {        
+	 post {     
 		success {
 			slackSend tokenCredentialId: 'slackJenkinsId', color: "good", message: "${JOB_NAME} - #${BUILD_NUMBER} succeeeded (<${env.BUILD_URL}|Open>)"	
         }
