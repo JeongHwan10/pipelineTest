@@ -1,11 +1,11 @@
 pipeline {
-
-	//agent any
-	agent {
-		docker {
-			image 'ubuntu:latest'
-		}
-	}
+	agent none
+	
+	//agent {
+	//	docker {
+	//		image 'ubuntu:latest'
+	//	}
+	//}
 	
 	//parameters {
 	//	string (name: 'parameterTest', defaultValue: 'Paraaaaaa', description: 'parameter hello')
@@ -62,7 +62,8 @@ pipeline {
 		stage('Maven Build') {
 			agent {
 				docker {
-					image 'maven:3.3.9-jdk-8'
+					image 'jenkins/jnlp-agent-maven:windows-nanoserver-jdk11'
+					// image 'maven:3.3.9-jdk-8'
 					// args '-v /root/.m2:/root/.m2'
 				}
 			}
