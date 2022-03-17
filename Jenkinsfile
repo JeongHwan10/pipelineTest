@@ -1,5 +1,12 @@
 pipeline {
-	agent any
+	// agent any
+	agent {
+		docker {
+			image 'maven:3.3.9-jdk-8'
+			args '-v /root/.m2:/root/.m2'
+		}
+	}
+	
 	//parameters {
 	//	string (name: 'parameterTest', defaultValue: 'Paraaaaaa', description: 'parameter hello')
 	//}
@@ -53,15 +60,6 @@ pipeline {
 		//}
 	
 		stage('Maven Build') {
-			agent {
-				docker {
-					image 'maven:3.3.9-jdk-8'
-					args '-v /root/.m2:/root/.m2'
-				}
-			}
-			environment {
-				JENKINS_RUNNING_IN_CONTAINER = true
-			}
 			steps {
 				sh 'mvn clean install'
 			}
