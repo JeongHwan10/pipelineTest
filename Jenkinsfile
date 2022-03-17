@@ -1,5 +1,5 @@
 pipeline {
-	agent none
+	agent any
 	//parameters {
 	//	string (name: 'parameterTest', defaultValue: 'Paraaaaaa', description: 'parameter hello')
 	//}
