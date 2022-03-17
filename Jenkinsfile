@@ -54,7 +54,7 @@ pipeline {
 	
 		stage('Maven Build') {
 			agent {
-				docker 'maven:3.3.9-jdk-8-alpine'
+				docker 'maven:3.3.9-jdk-8'
 			}
 			steps {
 				sh 'mvn clean install'
