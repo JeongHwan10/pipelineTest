@@ -15,6 +15,14 @@ pipeline {
 					// args '-v /root/.m2:/root/.m2'
 				}
 			}
+			steps {
+				sh 'mvn clean install'
+			}
+			post {
+				failure {
+					script { env.FAILURE_STAGE = 'Maven Build' }
+				}
+			}
         }
 		
 		stage('Docker Build and Push') {
