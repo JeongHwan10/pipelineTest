@@ -1,26 +1,5 @@
 pipeline {
-	agent any
-	
-	//parameters {
-	//	string (name: 'parameterTest', defaultValue: 'Paraaaaaa', description: 'parameter hello')
-	//}
-	/* pipeline 변수 설정 */
-	environment {
-		// 로컬 리포지토리 사용
-		// DockerUserName='wjdghks1057'
-		// DockerUserName='192.168.143.123:5000'
-		
-		// 네트워크 환경의 도커 리포지토리 G1
-		DockerUserName='192.168.143.151:5000'
-		
-		ProjectName='git-test'
-		registryCredential = 'docker-hub'
-	}
-	
-	tools {
-		maven 'Maven 3.3.9'
-		jdk 'jdk8'
-	}	
+	agent none
 	
 	options {
 		retry(1)
@@ -29,40 +8,14 @@ pipeline {
 	
 	/* SCM 소스 checkout */
 	stages{
-		stage('Initialize') {
-            steps{
-                echo "M2_HOME = /opt/maven"
-				echo "PATH = ${M2_HOME}/bin:${PATH}"
-				echo "PATH+EXTRA=/usr/local/bin"
-            }
-			post {
-				failure {
-					script { env.FAILURE_STAGE = 'Initialize' }
-				}
-			}
-        }		
-	
-		stage('Checkout') {
-			steps {
-				echo "git Checkout stage..."	
-			}
-			post {
-				failure {
-					script { env.FAILURE_STAGE = 'Checkout' }
-				}
-			}
-		}
-	
 		stage('Maven Build') {
-			steps {
-				sh 'mvn clean install'
-			}
-			post {
-				failure {
-					script { env.FAILURE_STAGE = 'Maven Build' }
+			agent {
+				docker {
+					image 'jenkins/jnlp-agent-maven:windows-nanoserver-jdk11'
+					// args '-v /root/.m2:/root/.m2'
 				}
 			}
-		}
+        }
 		
 		stage('Docker Build and Push') {
 			steps {
@@ -76,7 +29,7 @@ pipeline {
 			}
 			post {
 				always { 
-					// sh "docker logout"
+					sh "docker logout"
 					
 					sh "echo Docker image Clean..."
 					sh "docker rmi $DockerUserName/$ProjectName:$BUILD_NUMBER"
