@@ -12,7 +12,7 @@ variables:
   tag: '$(Build.BuildId)'
 stages:
 - stage: Build
-  displayName: Build image
+  displayName: Test Stages
   jobs:
   - job: Build
     displayName: Build
@@ -20,6 +20,7 @@ stages:
       vmImage: ubuntu-latest
     steps:
     - task: Maven@3
+      displayName: Build
       inputs:
         mavenPomFile: 'pom.xml'
         goals: 'clean install'
@@ -30,3 +31,11 @@ stages:
         mavenAuthenticateFeed: false
         effectivePomSkip: false
         sonarQubeRunAnalysis: false
+    - task: Docker@2
+      displayName: Docker Task
+      inputs:
+        containerRegistry: |
+          http://192.168.143.151:5000
+        repository: 'AzurePipelineTest'
+        command: 'buildAndPush'
+        Dockerfile: '**/Dockerfile'
