@@ -31,10 +31,3 @@ stages:
         mavenAuthenticateFeed: false
         effectivePomSkip: false
         sonarQubeRunAnalysis: false
-    - task: Docker@2
-      displayName: Docker Task
-      inputs:
-        containerRegistry: 'g1'
-        repository: 'AzurePipelineTest'
-        command: 'buildAndPush'
-        Dockerfile: '**/Dockerfile'
