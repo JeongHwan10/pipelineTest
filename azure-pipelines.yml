@@ -34,7 +34,7 @@ stages:
     - task: Docker@2
       displayName: Docker Task
       inputs:
-        containerRegistry: 'http://192.168.143.151:5000/v2'
+        containerRegistry: 'g1'
         repository: 'AzurePipelineTest'
         command: 'buildAndPush'
         Dockerfile: '**/Dockerfile'
